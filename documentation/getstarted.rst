@@ -2,7 +2,7 @@ Getting Started
 ========================================
 |
 
-Downloading GenAlg
+Downloading gaga
 -----------------------------
 
 |
@@ -11,7 +11,7 @@ Hypothetically (and I have not tested this at all), you should be able to instal
 
 .. code-block:: bash
 
-   pip install genalg
+   pip install gaga
 
 
 |
