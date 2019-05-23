@@ -8,7 +8,7 @@ Hopefully you can pip install it.
 Documentation can be found [here](https://awon8465.github.io/gagadoc/index.html) (Still in progress)
 
 ## Demo: Himmelblau's function
-Source:[Jupyter notebook](Demo Himmelblau.html) 
+(* See Demo Himmelblau.ipynb*) 
 
 <p align = "center">
   <img src="Himmelblau_function.png" width="40%">
