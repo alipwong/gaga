@@ -5,7 +5,7 @@ It's still in it's early stages.
 
 Hopefully you can pip install it.
 
-Documentation can be found [here](https://awon8465.github.io/gaga/index.html) (Still in progress)
+Documentation can be found [here](https://awon8465.github.io/gagadoc/index.html) (Still in progress)
 
 ## Demo: Himmelblau's function
 
