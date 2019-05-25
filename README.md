@@ -19,5 +19,5 @@ Source:[wikipedia](https://en.wikipedia.org/wiki/Himmelblau%27s_function)
 Here is a demonstration of my genetic algorithm exploring the four minima of Himmelblau's function simultaneously.
 
 <p align = "center">
-  <img src="demo/demo-himmelblau/x_y_progression.gif">
+  <img src="demos/demo-himmelblau/x_y_progression.gif">
 </p>
