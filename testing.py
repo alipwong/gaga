@@ -1,39 +1,26 @@
-import pickle
-import bz2
-from genalg.GA import ga
+import gaga as ga
 
-genes = {'x':(-2, 2),
-        'y':(-1, 3)}
+genes = {'x':(-1.5, 1.5),
+        'y':(-1.5, 1.5)}
 
 def evaluate(individual):
 
-    # constants
-    a = 1
-    b = 100
-
     #  unpack chromosome
-    x = individual.CHROMOSOME['x']
-    y = individual.CHROMOSOME['y']
+    x = individual.genes['x']
+    y = individual.genes['y']
 
-    individual.FITNESS_SCORE = (pow(a - x, 2) + b * pow(y - pow(x, 2), 2))
-
-sim = ga(genes, evaluate, results_folder = "demo-rosenbrock")
-sim.run_simulation()
-sim.results.plot_fitness()
-
-RESULTS_FOLDER = "demo-rosenbrock/"
-
-with bz2.BZ2File(RESULTS_FOLDER + "results_obj", 'rb') as f:
-    results = pickle.load(f)
+    individual.fitness_score = pow(x, 2) + pow(y, 2)
 
 
-print(results.data)
-print(results.__dict__.keys())
-print(results.epochs)
-print(results.data["genes"][0])
+sim = ga.ga(genes,
+            evaluate,
+            selection = 'roulette_wheel',
+            epoch = 25,
+            mutate = 0.1,
 
-results.animate('x', 'y', optimum = [1, 1], inset = [0.75, 1.25, 0.75, 1.25])
-
-
-results.print_best()
-
+            population_size = 25)
+# sim.run_simulation()
+#
+# sim.results.plot_fitness()
+# sim.results.print_best()
+# sim.results.animate('x', 'y', optimum = [0, 0])
