@@ -221,9 +221,10 @@ Reduce either the clone or mutant rate (or both).
 
         print("This function hasn't been written yet")
 
-    def run_simulation(self):
+    def run_simulation(self, seed = 0):
 
         ''' Forced to actually run a simulation'''
+        np.random.seed(seed)
 
         self.__init_population()
         for i in range(self.epoch):

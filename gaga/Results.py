@@ -79,22 +79,23 @@ class Results:
         return min_val, max_val
 
 
-    def draw(self, i, ax, x_gene, y_gene, s, alpha, cmap, fmin, fmax):
+    def draw(self, i, ax, x_gene, y_gene, s, alpha, cmap, fmin, fmax, bounds, optimum, os, o_front, om, oc):
         x = self.data["genes"][i][x_gene]
         y = self.data["genes"][i][y_gene]
         fitness_score = self.data["fitness"][i]
 
-        # Set the range and domain of the image
-        x_range = self.gene_global_max(x_gene) - self.gene_global_min(x_gene)
-        y_range = self.gene_global_max(y_gene) - self.gene_global_min(y_gene)
-        ax.set_xlim(self.gene_global_min(x_gene) - 0.1 * x_range, self.gene_global_max(x_gene) + 0.1 * x_range)
-        ax.set_ylim(self.gene_global_min(y_gene) - 0.1 * y_range, self.gene_global_max(y_gene) + 0.1 * y_range)
+        ax.set_xlim(bounds[0], bounds[1])
+        ax.set_ylim(bounds[2], bounds[3])
 
         ax.scatter(x, y, c = fitness_score, s = s, alpha = alpha, cmap = cmap, vmin = fmin, vmax = fmax)
 
-    def draw_inset(self, i, ax1, ax2, x_gene, y_gene, s, alpha, cmap, fmin, fmax, inset):
+        if len(optimum) > 0 and o_front is True:
+            ax.scatter(optimum[0], optimum[1], s=os, marker=om, c=oc,)
 
-        self.draw(i, ax1, x_gene, y_gene, s, alpha, cmap, fmin, fmax)
+
+    def draw_inset(self, i, ax1, ax2, x_gene, y_gene, s, alpha, cmap, fmin, fmax, bounds, optimum, os, o_front, om, oc, inset):
+
+        self.draw(i, ax1, x_gene, y_gene, s, alpha, cmap, fmin, fmax, bounds, optimum, os, o_front, om, oc)
         # set up the bounds for the inset
         x_min = inset[0]
         x_max = inset[1]
@@ -111,9 +112,12 @@ class Results:
         mark_inset(ax1, ax2, loc1=2, loc2=3, ec='k')
 
         ax2.scatter(x, y, c=fitness_score, s=s, alpha=alpha, cmap=cmap, vmin = fmin, vmax = fmax)
+        if len(optimum) > 0 and o_front is True:
+            ax1.scatter(optimum[0], optimum[1], s=os, marker=om, c=oc,)
+            ax2.scatter(optimum[0], optimum[1], s=os, marker=om, c=oc, )
 
 
-    def animate(self, x_gene, y_gene, s = 5, alpha = 0.5, fps = 30, log_scale = False, fmin = None, fmax = None, cmap = cm.rainbow, optimum = [], inset = False):
+    def animate(self, x_gene, y_gene, s = 5, alpha = 0.5, fps = 30, bounds = None, log_scale = False, fmin = None, fmax = None, cmap = cm.rainbow, optimum = [], os = 100, o_front = True, om = '*', oc = 'k', inset = False, filename = None):
 
         plt.clf()
 
@@ -127,24 +131,28 @@ class Results:
             ax2.set_xlabel(x_gene)
             ax2.set_ylabel(y_gene)
 
-
         fig.subplots_adjust(left=0.12, bottom=0.2, right=0.92, top=0.93, wspace=0.4, hspace=None)
         ax1.set_xlabel(x_gene)
         ax1.set_ylabel(y_gene)
 
+        # Set the bounds of the image
+        if bounds is None:
+            x_range = self.gene_global_max(x_gene) - self.gene_global_min(x_gene)
+            y_range = self.gene_global_max(y_gene) - self.gene_global_min(y_gene)
 
-        # Set the range and domain of the image
-        x_range = self.gene_global_max(x_gene) - self.gene_global_min(x_gene)
-        y_range = self.gene_global_max(y_gene) - self.gene_global_min(y_gene)
+            bounds = [self.gene_global_min(x_gene) - 0.1 * x_range,
+                      self.gene_global_max(x_gene) + 0.1 * x_range,
+                      self.gene_global_min(y_gene) - 0.1 * y_range,
+                      self.gene_global_max(y_gene) + 0.1 * y_range]
 
-        ax1.set_xlim(self.gene_global_min(x_gene) - 0.1 * x_range, self.gene_global_max(x_gene) + 0.1 * x_range)
-        ax1.set_ylim(self.gene_global_min(y_gene) - 0.1 * y_range, self.gene_global_max(y_gene) + 0.1 * y_range)
+        ax1.set_xlim(bounds[0], bounds[1])
+        ax1.set_ylim(bounds[2], bounds[3])
 
         # plot optimum
         if len(optimum) > 0:
-            ax1.scatter(optimum[0], optimum[1], s=5 * s, marker='*', c='k',)
+            ax1.scatter(optimum[0], optimum[1], s=os, marker=om, c=oc,)
         if inset:
-            ax2.scatter(optimum[0], optimum[1], s=5 * s, marker='*', c='k', )
+            ax2.scatter(optimum[0], optimum[1], s=os, marker=om, c=oc, )
 
         # Set up the colorbar range
         if fmin is None:
@@ -169,11 +177,14 @@ class Results:
             cb.set_label("Fitness score")
 
         if inset is False:
-            ani = animation.FuncAnimation(fig, self.draw, fargs = (ax1, x_gene, y_gene, s, alpha, cmap, fmin, fmax), frames = self.epochs, interval = 5, repeat = True)
+            ani = animation.FuncAnimation(fig, self.draw, fargs = (ax1, x_gene, y_gene, s, alpha, cmap, fmin, fmax, bounds, optimum, os, o_front, om, oc), frames = self.epochs, interval = 5, repeat = True)
         else:
-            ani = animation.FuncAnimation(fig, self.draw_inset, fargs=(ax1, ax2, x_gene, y_gene, s, alpha, cmap, fmin, fmax, inset), frames=self.epochs,
+            ani = animation.FuncAnimation(fig, self.draw_inset, fargs=(ax1, ax2, x_gene, y_gene, s, alpha, cmap, fmin, fmax, bounds, optimum, os, o_front, om, oc, inset), frames=self.epochs,
                                       interval=5, repeat=True)
-        ani.save("{}{}_{}_progression.gif".format(self.results_folder, x_gene, y_gene),
+        if filename is not None:
+            ani.save("{}/{}.gif".format(self.results_folder, filename), writer='imagemagick', fps=fps)
+        else:
+            ani.save("{}{}_{}_progression.gif".format(self.results_folder, x_gene, y_gene),
                  writer='imagemagick', fps=fps)
 
         return ani
