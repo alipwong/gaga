@@ -57,7 +57,7 @@ class ga:
                 If ``population_size = 25`` and ``mutate = 0.1`` then in each generation, there will be 3 mutants.
 
         **selection: string, (default = 'tournament')**
-            Specifies the method of selection. Choose from: 'tournament', 'roulette_wheel'.
+            Specifies the method of selection. Choose from: 'tournament', 'roulette_wheel'. :ref:`See selection <selection-theory>`
 
             * .. automethod:: _ga__tournament
 
