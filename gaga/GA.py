@@ -193,6 +193,7 @@ Reduce either the clone or mutant rate (or both).
         self.results.gene_names = self.gene_names
         self.results.results_folder = self.results_folder
 
+
         if not os.path.exists(self.results_folder):
             os.makedirs(self.results_folder)
 
