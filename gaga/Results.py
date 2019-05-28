@@ -189,13 +189,16 @@ class Results:
 
         return ani
 
-    def plot_fitness(self):
+    def plot_fitness(self, fname = None):
         plt.figure()
         plt.title("Minimum fitness score")
         plt.xlabel("Epoch")
         plt.ylabel("fitness")
         plt.plot(self.fitness_mins())
-        plt.savefig(fname = "{}fitness".format(self.results_folder))
+        if fname is None:
+            plt.savefig(fname = "{}fitness".format(self.results_folder))
+        else:
+            plt.savefig(fname="{}{}".format(self.results_folder, fname))
         plt.show()
 
     def plot_diversity(self, gene = None):

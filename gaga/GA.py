@@ -57,7 +57,11 @@ class ga:
                 If ``population_size = 25`` and ``mutate = 0.1`` then in each generation, there will be 3 mutants.
 
         **selection: string, (default = 'tournament')**
-            Specifies the method of selection. Choose from: 'tournament', 'roulette_wheel'. :ref:`See selection <selection-theory>`
+            Specifies the method of selection. Choose from: 'tournament', 'roulette_wheel'.
+
+            .. seealso::
+
+                :ref:`selection <selection-theory>`
 
             * .. automethod:: _ga__tournament
 
@@ -218,7 +222,10 @@ Reduce either the clone or mutant rate (or both).
 
     def info(self):
         """This function will display simulation information
+
         """
+        print("")
+        print("Results_folder{}".format(self.results_folder))
 
         print("This function hasn't been written yet")
 
