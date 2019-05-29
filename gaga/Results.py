@@ -184,7 +184,7 @@ class Results:
         if filename is not None:
             ani.save("{}/{}.gif".format(self.results_folder, filename), writer='imagemagick', fps=fps)
         else:
-            ani.save("{}{}_{}_progression.gif".format(self.results_folder, x_gene, y_gene),
+            ani.save("{}/{}_{}_animation.gif".format(self.results_folder, x_gene, y_gene),
                  writer='imagemagick', fps=fps)
 
         return ani

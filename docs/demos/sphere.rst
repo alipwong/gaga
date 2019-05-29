@@ -1,22 +1,6 @@
-Getting Started
-========================================
-|
-
-Downloading gaga
------------------------------
-
-|
-
-Hypothetically (and I have not tested this at all), you should be able to install this via pip.
-
-.. code-block:: bash
-
-   pip install gaga
-
-
-A simple demonstration: The sphere function
--------------------------------------------
-.. image:: ./_static/Sphere_function.jpg
+The sphere function
+-------------------
+.. image:: ../_static/Sphere_function.jpg
     :align: center
     :width: 45%
     :target: https://en.wikipedia.org/wiki/File:Sphere_function_in_3D.pdf
@@ -74,7 +58,7 @@ We can also display the fitness of the best individual at each epoch.
 
     sim.results.plot_fitness()
 
-.. image:: ./_static/sphere_fitness.png
+.. image:: ../_static/sphere_fitness.png
     :align: center
     :width: 45%
 
@@ -84,16 +68,8 @@ Finally, the following will generate an animation. We also specify the analytica
 
     sim.results.animate('x', 'y', optimum = [0, 0])
 
-.. image:: ./_static/sphere.gif
+.. image:: ../_static/sphere.gif
     :align: center
     :width: 45%
-
-Further demonstrations
------------------------------
-.. toctree::
-   :maxdepth: 1
-   :name: demos
-   
-   himmelblau
 
 :ref:`Return Home <home>`

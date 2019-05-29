@@ -1,26 +1,21 @@
 import gaga as ga
 
-genes = {'x':(-1.5, 1.5),
-        'y':(-1.5, 1.5)}
+genes = {'x':(-2, 2),
+        'y':(-1, 3)}
 
 def evaluate(individual):
 
-    #  unpack chromosome
+    a = 1
+    b = 100
+
     x = individual.genes['x']
     y = individual.genes['y']
 
-    individual.fitness_score = pow(x, 2) + pow(y, 2)
+    individual.fitness_score = (pow(a - x, 2) + b * pow(y - pow(x, 2), 2))
 
+sim = ga.ga(genes, evaluate, results_folder = 'demos/demo-rosenbrock-pycharm')
+sim.run_simulation(seed=0)
 
-sim = ga.ga(genes,
-            evaluate,
-            selection = 'roulette_wheel',
-            epoch = 25,
-            mutate = 0.1,
-
-            population_size = 25)
-# sim.run_simulation()
-#
-# sim.results.plot_fitness()
-# sim.results.print_best()
-# sim.results.animate('x', 'y', optimum = [0, 0])
+sim.results.plot_fitness()
+sim.results.print_best()
+sim.results.animate('x', 'y', optimum = [1, 1], fmax = 20)
