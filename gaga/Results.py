@@ -11,8 +11,15 @@ import numpy as np
 plt.style.use('ggplot')
 
 class Results:
-    """Results"""
+    """
+    
+    This class defines a results object that is created at the end of running a genetic algorithm simulation.
+
+    
+    """
     def __init__(self):
+        
+    
 
         self.trial_N = None
         self.results_folder = None
@@ -31,33 +38,52 @@ class Results:
         # genes: a dictionary with each gene as a key. The corresponding values are that of the genes at each epoch
         # fitness: the fitness scores of each individual at each epoch
 
-    def gene_mins(self, gene):
+    def __gene_mins(self, gene):
         return [min(g[gene]) for g in self.data["genes"]]
 
-    def gene_maxs(self, gene):
+    def __gene_maxs(self, gene):
         return [max(g[gene]) for g in self.data["genes"]]
 
     def gene_median(self, gene):
+        """
+         Returns a list of the median value of the specified gene in each generation
+        """
         return [np.median(g[gene]) for g in self.data["genes"]]
 
     def gene_global_min(self, gene):
-        return min(self.gene_mins(gene))
+        """
+        Returns the minimum value of the specified gene across all individuals in the genetic algorithm
+        """
+        return min(self.__gene_mins(gene))
 
     def gene_global_max(self, gene):
-        return max(self.gene_maxs(gene))
+        """
+        Returns the maximum value of the specified gene across all individuals in the genetic algorithm
+        """
+        return max(self.__gene_maxs(gene))
 
     def fitness_maxs(self):
-        '''returns the maximum fitness in each generation'''
+        """
+        Returns a list with the maximum fitness in each generation
+        """
         return [max(f) for f in self.data["fitness"]]
 
     def fitness_mins(self):
-        '''returns the minimum fitness in each generation'''
+        """
+        Returns a list with the minimum fitness in each generation
+        """
         return [min(f) for f in self.data["fitness"]]
 
     def fitness_global_min(self):
+        """
+        Returns the minimum fitness across all individuals in the genetic algorithm
+        """
         return min(self.fitness_mins())
 
     def fitness_global_max(self):
+        """
+        Returns the maximum fitness across all individuals in the genetic algorithm
+        """
         return max(self.fitness_maxs())
 
     def create_fitness_df(self):
@@ -66,8 +92,8 @@ class Results:
     def __calculate_limits(self, gene, margin = 0, i = 0):
         center = self.gene_median(gene)[-1]
 
-        gene_maxs = max(self.gene_maxs(gene)[i:])
-        gene_mins = min(self.gene_mins(gene)[i:])
+        gene_maxs = max(self.__gene_maxs(gene)[i:])
+        gene_mins = min(self.__gene_mins(gene)[i:])
 
         diameter = max(abs(gene_maxs - center), abs(gene_mins - center))
         if not isinstance(margin, int):
@@ -79,7 +105,7 @@ class Results:
         return min_val, max_val
 
 
-    def draw(self, i, ax, x_gene, y_gene, s, alpha, cmap, fmin, fmax, bounds, optimum, os, o_front, om, oc):
+    def __draw(self, i, ax, x_gene, y_gene, s, alpha, cmap, fmin, fmax, bounds, optimum, os, o_front, om, oc):
         x = self.data["genes"][i][x_gene]
         y = self.data["genes"][i][y_gene]
         fitness_score = self.data["fitness"][i]
@@ -93,14 +119,18 @@ class Results:
             ax.scatter(optimum[0], optimum[1], s=os, marker=om, c=oc,)
 
 
-    def draw_inset(self, i, ax1, ax2, x_gene, y_gene, s, alpha, cmap, fmin, fmax, bounds, optimum, os, o_front, om, oc, inset):
+    def __draw_inset(self, i, ax1, ax2, x_gene, y_gene, s, alpha, cmap, fmin, fmax, bounds, optimum, os, o_front, om, oc, inset, scale = 0.1):
 
-        self.draw(i, ax1, x_gene, y_gene, s, alpha, cmap, fmin, fmax, bounds, optimum, os, o_front, om, oc)
+        self.__draw(i, ax1, x_gene, y_gene, s, alpha, cmap, fmin, fmax, bounds, optimum, os, o_front, om, oc)
         # set up the bounds for the inset
-        x_min = inset[0]
-        x_max = inset[1]
-        y_min = inset[2]
-        y_max = inset[3]
+        if inset is True:
+            x_min, x_max = self.__calculate_limits(x_gene, margin = [scale - 1])
+            y_min, y_max = self.__calculate_limits(y_gene, margin = [scale - 1])
+        else:
+            x_min = inset[0]
+            x_max = inset[1]
+            y_min = inset[2]
+            y_max = inset[3]
 
         ax2.set_xlim(x_min, x_max)
         ax2.set_ylim(y_min, y_max)
@@ -117,7 +147,99 @@ class Results:
             ax2.scatter(optimum[0], optimum[1], s=os, marker=om, c=oc, )
 
 
-    def animate(self, x_gene, y_gene, s = 5, alpha = 0.5, fps = 30, bounds = None, log_scale = False, fmin = None, fmax = None, cmap = cm.rainbow, optimum = [], os = 100, o_front = True, om = '*', oc = 'k', inset = False, filename = None):
+    def animate(self, x_gene, y_gene, s = 5, alpha = 0.5, fps = 30, bounds = None, log_scale = False, fmin = None, fmax = None, cmap = cm.rainbow, optimum = [], os = 100, o_front = True, om = '*', oc = 'k', inset = False, scale = 0.1, filename = None):
+
+        """
+
+            **x_gene: string**
+                The name of the gene to be plotted on the x axis.
+
+            **y_gene: string**
+                The name of the gene to be plotted on the y axis.
+
+            **s: float**
+                Marker size
+
+            **alpha: float**
+                Marker transparency
+
+            **fps: int**
+                Frames per second
+
+            **bounds:**
+
+            **log_scale: Boolean**
+                If true, plots the fitness scores on a log scale.
+
+                .. seealso::
+
+                    :ref:`Fitness on a logscale <fitness_logscale>`
+
+            **fmin: int or float**
+                Minimum fitness value shown on the colorbar.
+
+                .. seealso::
+
+                    :ref:`fmin and fmax <fmin-fmax>`
+
+            **fmax: int or float**
+                Maximum fitness value shown on the colorbar.
+
+                .. seealso::
+
+                    :ref:`fmin and fmax <fmin-fmax>`
+
+            **cmap: matplotlib colormap**
+                Colormap used for the animation.
+
+                .. seealso::
+
+                    :ref:`Colormap <colormap>`
+
+
+            **optimum: list**
+                Allows you to specify and mark optima on the animation.
+
+                .. seealso::
+
+                    :ref:`Marking the optimum <optima>`
+
+            **os: float**
+                Size of markers used to mark the optima.
+
+            **o_front: boolean**
+
+                * if true, the markers used to mark the optima will be in the foreground.
+
+                * if false, the markers will be in the background.
+
+            **om: char**
+                Style of markers used to mark the optima.
+
+            **oc: char**
+                Color of markers used to mark the optima.
+
+            **inset: boolean or list**
+
+                * if false, there will be no inset
+
+                * if true, there will be an inset marked around the median individual of the final population
+
+                * if list, there will be an inset marked around the bounds [xmin, xmax ymin, ymax]
+
+                .. seealso::
+
+                    :ref:`Inset <inset>`
+
+            **scale: float**
+                Only used for a default inset. Dictates the zoom of the inset.
+
+            **filename: string**
+                Name the gif will be saved to.
+
+                .. note::
+                    Specify the name without the ``.gif`` extension.
+        """
 
         plt.clf()
 
@@ -177,9 +299,9 @@ class Results:
             cb.set_label("Fitness score")
 
         if inset is False:
-            ani = animation.FuncAnimation(fig, self.draw, fargs = (ax1, x_gene, y_gene, s, alpha, cmap, fmin, fmax, bounds, optimum, os, o_front, om, oc), frames = self.epochs, interval = 5, repeat = True)
+            ani = animation.FuncAnimation(fig, self.__draw, fargs = (ax1, x_gene, y_gene, s, alpha, cmap, fmin, fmax, bounds, optimum, os, o_front, om, oc), frames = self.epochs, interval = 5, repeat = True)
         else:
-            ani = animation.FuncAnimation(fig, self.draw_inset, fargs=(ax1, ax2, x_gene, y_gene, s, alpha, cmap, fmin, fmax, bounds, optimum, os, o_front, om, oc, inset), frames=self.epochs,
+            ani = animation.FuncAnimation(fig, self.__draw_inset, fargs=(ax1, ax2, x_gene, y_gene, s, alpha, cmap, fmin, fmax, bounds, optimum, os, o_front, om, oc, inset, scale), frames=self.epochs,
                                       interval=5, repeat=True)
         if filename is not None:
             ani.save("{}/{}.gif".format(self.results_folder, filename), writer='imagemagick', fps=fps)
@@ -190,6 +312,15 @@ class Results:
         return ani
 
     def plot_fitness(self, fname = None):
+
+        """
+        Plots the minimum fitness at each generation.
+
+        .. seealso::
+
+            :ref:`sphere demo <sphere-results>`
+
+        """
         plt.figure()
         plt.title("Minimum fitness score")
         plt.xlabel("Epoch")
@@ -216,6 +347,13 @@ class Results:
         pass
 
     def print_best(self, minimise = True):
+        """
+        Prints the genes and the fitness score of the best individual.
+
+        .. seealso::
+
+            :ref:`sphere demo <sphere-results>`
+        """
         best = False
         for epoch in self.data["history"]:
             for ind in epoch:

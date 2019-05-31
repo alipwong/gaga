@@ -100,13 +100,6 @@ class ga:
 
         **load: boolean (default = False)**
 
-    :Methods:
-
-        .. automethod:: info
-
-        .. automethod:: run_simulation
-
-        .. automethod:: measure_diversity
 
     """
 
