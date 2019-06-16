@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
      name='gaga',
-     version='0.1.1',
+     version='0.1.6',
      author="Alison Wong",
      author_email="a.wong@sydney.edu.au",
      description="A genetic algorithm",

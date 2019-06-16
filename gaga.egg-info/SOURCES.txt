@@ -5,6 +5,7 @@ gaga/GA.py
 gaga/Individual.py
 gaga/Results.py
 gaga/__init__.py
+gaga/mcfost.py
 gaga.egg-info/PKG-INFO
 gaga.egg-info/SOURCES.txt
 gaga.egg-info/dependency_links.txt

@@ -86,6 +86,12 @@ class Results:
         """
         return max(self.fitness_maxs())
 
+    def index_mins(self):
+        return np.argmin(self.data['fitness'], axis = 1)
+
+    def index_maxs(self):
+        return np.argmax(self.data['fitness'], axis = 1)
+
     def create_fitness_df(self):
         pass
 
@@ -157,39 +163,39 @@ class Results:
             **y_gene: string**
                 The name of the gene to be plotted on the y axis.
 
-            **s: float**
+            **s: int, (default = 5)**
                 Marker size
 
-            **alpha: float**
+            **alpha: float, (default = 0.5)**
                 Marker transparency
 
-            **fps: int**
+            **fps: int, (default = 30)**
                 Frames per second
 
-            **bounds:**
+            **bounds: (default = None)**
 
-            **log_scale: Boolean**
+            **log_scale: Boolean, (default = False)**
                 If true, plots the fitness scores on a log scale.
 
                 .. seealso::
 
                     :ref:`Fitness on a logscale <fitness_logscale>`
 
-            **fmin: int or float**
+            **fmin: int or float, (default = None)**
                 Minimum fitness value shown on the colorbar.
 
                 .. seealso::
 
                     :ref:`fmin and fmax <fmin-fmax>`
 
-            **fmax: int or float**
+            **fmax: int or float, (default = None)**
                 Maximum fitness value shown on the colorbar.
 
                 .. seealso::
 
                     :ref:`fmin and fmax <fmin-fmax>`
 
-            **cmap: matplotlib colormap**
+            **cmap: matplotlib colormap, (default = cm.rainbow)**
                 Colormap used for the animation.
 
                 .. seealso::
@@ -197,29 +203,29 @@ class Results:
                     :ref:`Colormap <colormap>`
 
 
-            **optimum: list**
+            **optimum: list, (default = [])**
                 Allows you to specify and mark optima on the animation.
 
                 .. seealso::
 
                     :ref:`Marking the optimum <optima>`
 
-            **os: float**
+            **os: float, (default = 100)**
                 Size of markers used to mark the optima.
 
-            **o_front: boolean**
+            **o_front: boolean, (default = True)**
 
                 * if true, the markers used to mark the optima will be in the foreground.
 
                 * if false, the markers will be in the background.
 
-            **om: char**
+            **om: char, (default = '*')**
                 Style of markers used to mark the optima.
 
-            **oc: char**
+            **oc: char, (default = 'k')**
                 Color of markers used to mark the optima.
 
-            **inset: boolean or list**
+            **inset: boolean or list, (default = False)**
 
                 * if false, there will be no inset
 
@@ -231,11 +237,11 @@ class Results:
 
                     :ref:`Inset <inset>`
 
-            **scale: float**
+            **scale: float, (default = 0.1)**
                 Only used for a default inset. Dictates the zoom of the inset.
 
-            **filename: string**
-                Name the gif will be saved to.
+            **filename: string, (default = None)**
+                Name the gif will be saved to. By default it is saved as ``<x_gene>_<y_gene>_animation.gif``
 
                 .. note::
                     Specify the name without the ``.gif`` extension.
@@ -272,9 +278,9 @@ class Results:
 
         # plot optimum
         if len(optimum) > 0:
-            ax1.scatter(optimum[0], optimum[1], s=os, marker=om, c=oc,)
-        if inset:
-            ax2.scatter(optimum[0], optimum[1], s=os, marker=om, c=oc, )
+            ax1.scatter(optimum[0], optimum[1], s=os, marker=om, c=oc)
+            if inset:
+                ax2.scatter(optimum[0], optimum[1], s=os, marker=om, c=oc)
 
         # Set up the colorbar range
         if fmin is None:
@@ -370,3 +376,115 @@ class Results:
         for gene in self.gene_names:
             print(gene + ": {0:4e}".format(best.genes[gene]))
         print("fitness score: {0:4e}".format(best.fitness_score))
+
+    def __draw_correlate(self, i, ax, VAMP_data, Stokes, baseline_colours, bar_colour):
+
+        plt.cla()
+        ind = self.index_mins()
+        ax.set_xlim([0.97, 1.04])
+        ax.set_ylim([0.97, 1.04])
+        plt.plot([0.97, 1.04], [0.97, 1.04])
+
+        if 'Q' in Stokes:
+            obs_data = VAMP_data.vhvv
+            sim_data = self.data["data_Q"][i][ind[i]]
+            errors = VAMP_data.vhvverr
+            title = "Correlation (Stokes Q)"
+            error = self.data["reduced_chi2err_Q"][i][ind[i]]
+            ax.scatter(sim_data, obs_data, c=baseline_colours)
+            ax.errorbar(sim_data, obs_data, yerr=errors, marker='', linestyle='', alpha=0.8, capsize=0, zorder=0,
+                        ecolor=bar_colour)
+        if 'U' in Stokes:
+            obs_data = VAMP_data.vhvvu
+            sim_data = self.data["data_U"][i][ind[i]]
+            errors = VAMP_data.vhvvuerr
+            error = self.data["reduced_chi2err_U"][i][ind[i]]
+            title = "Correlation (Stokes U)"
+            ax.scatter(sim_data, obs_data, c=baseline_colours)
+            ax.errorbar(sim_data, obs_data, yerr=errors, marker='', linestyle='', alpha=0.8, capsize=0, zorder=0,
+                        ecolor=bar_colour)
+
+        if 'Q' in Stokes and 'U' in Stokes:
+            title = 'Correlation'
+            error = self.data["reduced_chi2err"][i][ind[i]]
+
+        # place a text box in upper left in axes coords
+        ax.text(0.05, 0.95, '$\chi^2$ Error: {0:.4f}'.format(error), transform=ax.transAxes, fontsize=14, verticalalignment='top')
+        ax.set_title(title)
+        ax.set_xlabel("Model Visibility Ratio")
+        ax.set_ylabel("Observed Visibility Ratio")
+
+    def correlate(self, VAMP_data, filename=None, Stokes="QU", fps=30):
+
+        fig = plt.figure(figsize=(6, 5))
+        ax = fig.add_subplot(111)
+
+        baselines = VAMP_data.blengths
+        # only select the baselines that are smaller than the maximum baseline
+        baseline_colours = baselines[baselines <= 8]
+
+        scatter_plot = ax.scatter(VAMP_data.vhvv, VAMP_data.vhvv, alpha=0, c=baseline_colours)
+        clb = plt.colorbar(scatter_plot, label="Baseline length (m)")
+        bar_colour = clb.to_rgba(baseline_colours)
+
+        ani = animation.FuncAnimation(fig, self.__draw_correlate,
+                                      fargs=(ax, VAMP_data, Stokes, baseline_colours, bar_colour),
+                                      frames=self.epochs, interval=5, repeat=True)
+        if filename is not None:
+            ani.save("{}/{}.gif".format(self.results_folder, filename), writer='imagemagick', fps=fps)
+        else:
+            ani.save("{}/Correlation_{}.gif".format(self.results_folder, Stokes),
+                     writer='imagemagick', fps=fps)
+
+    def __draw_vis(self, i, ax, VAMP_data, Stokes, baseline_colours, bar_colour, ylim):
+
+        plt.cla()
+        ind = self.index_mins()
+        ax.set_ylim(ylim)
+
+        if 'Q' in Stokes:
+            obs_data = VAMP_data.vhvv
+            sim_data = self.data["data_Q"][i][ind[i]]
+            errors = VAMP_data.vhvverr
+            title = "Sampled Visibility Ratio (Stokes Q)"
+            error = self.data["reduced_chi2err_Q"][i][ind[i]]
+
+        if 'U' in Stokes:
+            obs_data = VAMP_data.vhvvu
+            sim_data = self.data["data_U"][i][ind[i]]
+            errors = VAMP_data.vhvvuerr
+            title = "Sampled Visibility Ratio (Stokes U)"
+            error = self.data["reduced_chi2err_U"][i][ind[i]]
+
+        scatter_plot = ax.scatter(VAMP_data.bazims, obs_data, marker='x', c=baseline_colours, label='observed')
+        scatter_plot = ax.scatter(VAMP_data.bazims, sim_data, marker='o', c=baseline_colours, label='model')
+        ax.errorbar(VAMP_data.bazims, obs_data, yerr=errors, marker='', linestyle='', alpha=0.8, capsize=0, zorder=0,
+                    ecolor=bar_colour)
+
+        # place a text box in upper left in axes coords
+        ax.text(0.05, 0.95, '$\chi^2$ Error: {0:.4f}'.format(error), transform=ax.transAxes, fontsize=14, verticalalignment='top')
+        ax.set_title(title)
+        ax.set_xlabel("Polarised Visibility Ratio")
+        ax.set_ylabel("Baseline Azimuth Angle (radians)")
+
+    def vis(self, VAMP_data, filename=None, Stokes="Q", fps=30, ylim=[0.96, 1.04]):
+
+        fig = plt.figure(figsize=(6, 5))
+        ax = fig.add_subplot(111)
+
+        baselines = VAMP_data.blengths
+        # only select the baselines that are smaller than the maximum baseline
+        baseline_colours = baselines[baselines <= 8]
+
+        scatter_plot = ax.scatter(VAMP_data.vhvv, VAMP_data.vhvv, alpha=0, c=baseline_colours)
+        clb = plt.colorbar(scatter_plot, label="Baseline length (m)")
+        bar_colour = clb.to_rgba(baseline_colours)
+
+        ani = animation.FuncAnimation(fig, self.__draw_vis,
+                                      fargs=(ax, VAMP_data, Stokes, baseline_colours, bar_colour, ylim),
+                                      frames=self.epochs, interval=5, repeat=True)
+        if filename is not None:
+            ani.save("{}/{}.gif".format(self.results_folder, filename), writer='imagemagick', fps=fps)
+        else:
+            ani.save("{}/visibilities_{}.gif".format(self.results_folder, Stokes),
+                     writer='imagemagick', fps=fps)

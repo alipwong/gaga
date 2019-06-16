@@ -507,6 +507,7 @@ Reduce either the clone or mutant rate (or both).
 
         # data saved at the end of the evaluation function
         eval_data = self.new_population[0].data.keys()
+
         for i in eval_data:
             if i not in self.results.data:
                 self.results.data[i] = []

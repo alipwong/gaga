@@ -40,8 +40,8 @@ class Individual:
 
     def __init__(self, genes):
 
-
+        self.data = {}
         self.genes = self.validate(genes)
         self.evaluate()
-        self.data = {}
+
 
