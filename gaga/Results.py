@@ -423,7 +423,7 @@ class Results:
         # only select the baselines that are smaller than the maximum baseline
         baseline_colours = baselines[baselines <= 8]
 
-        scatter_plot = ax.scatter(VAMP_data.vhvv, VAMP_data.vhvv, alpha=0, c=baseline_colours)
+        scatter_plot = ax.scatter(VAMP_data.vhvv, VAMP_data.vhvv, c=baseline_colours)
         clb = plt.colorbar(scatter_plot, label="Baseline length (m)")
         bar_colour = clb.to_rgba(baseline_colours)
 
@@ -464,8 +464,8 @@ class Results:
         # place a text box in upper left in axes coords
         ax.text(0.05, 0.95, '$\chi^2$ Error: {0:.4f}'.format(error), transform=ax.transAxes, fontsize=14, verticalalignment='top')
         ax.set_title(title)
-        ax.set_xlabel("Polarised Visibility Ratio")
-        ax.set_ylabel("Baseline Azimuth Angle (radians)")
+        ax.set_ylabel("Polarised Visibility Ratio")
+        ax.set_xlabel("Baseline Azimuth Angle (radians)")
 
     def vis(self, VAMP_data, filename=None, Stokes="Q", fps=30, ylim=[0.96, 1.04]):
 
@@ -476,7 +476,8 @@ class Results:
         # only select the baselines that are smaller than the maximum baseline
         baseline_colours = baselines[baselines <= 8]
 
-        scatter_plot = ax.scatter(VAMP_data.vhvv, VAMP_data.vhvv, alpha=0, c=baseline_colours)
+
+        scatter_plot = ax.scatter(VAMP_data.vhvv, VAMP_data.vhvv, c=baseline_colours)
         clb = plt.colorbar(scatter_plot, label="Baseline length (m)")
         bar_colour = clb.to_rgba(baseline_colours)
 
