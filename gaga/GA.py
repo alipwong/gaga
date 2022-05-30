@@ -245,9 +245,11 @@ Reduce either the clone or mutant rate (or both).
             self.__clone()
             # self.__print_ind(self.new_population, title="New population (after cloning)")
             self.mutation()
+            
+            self.__save_results(self.epoch)
         if self.verbose:
             self.__print_ind(self.new_population, title="final population")
-        self.__save_results(self.epoch)
+
 
 
     def measure_diversity(self):
@@ -517,7 +519,7 @@ Reduce either the clone or mutant rate (or both).
 
         self.results.epochs += 1
 
-        with bz2.BZ2File(self.results_folder + "results_obj", 'wb') as f:
+        with bz2.BZ2File(self.results_folder + "results_obj_{}".format(epoch), 'wb') as f:
             pickle.dump(self.results, f)
 
     # genes VALIDATION

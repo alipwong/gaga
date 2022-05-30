@@ -309,11 +309,12 @@ class Results:
         else:
             ani = animation.FuncAnimation(fig, self.__draw_inset, fargs=(ax1, ax2, x_gene, y_gene, s, alpha, cmap, fmin, fmax, bounds, optimum, os, o_front, om, oc, inset, scale), frames=self.epochs,
                                       interval=5, repeat=True)
+        writer = animation.FFMpegWriter(fps=fps)
         if filename is not None:
-            ani.save("{}/{}.gif".format(self.results_folder, filename), writer='imagemagick', fps=fps)
+            ani.save("{}/{}.mp4".format(self.results_folder, filename), writer=writer)
         else:
             ani.save("{}/{}_{}_animation.gif".format(self.results_folder, x_gene, y_gene),
-                 writer='imagemagick', fps=fps)
+                 writer=writer)
 
         return ani
 
